@@ -30,7 +30,17 @@ const useGetUsers = () => {
 
     const addUserToList = (user: User) => {
         setUsers((prev) => [...prev, user]);
-    }
+    };
+
+    const updateUserInList = (updatedUser: User) => {
+        setUsers((prev) => prev.map(user => 
+            user.id === updatedUser.id ? updatedUser : user
+        ));
+    };
+
+    const removeUserFromList = (userId: number) => {
+        setUsers((prev) => prev.filter(user => user.id !== userId));
+    };
 
     useEffect(() => {
         getUsers();
@@ -39,7 +49,9 @@ const useGetUsers = () => {
     return {
         users,
         getUsers,
-        addUserToList
+        addUserToList,
+        updateUserInList,
+        removeUserFromList
     };
 };
 

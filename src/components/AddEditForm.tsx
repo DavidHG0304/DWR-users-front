@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { User } from "../types/User.type";
 
 const formDefaultValues: User = {
@@ -10,18 +10,33 @@ const formDefaultValues: User = {
 type AddEditFormProps = {
     onSubmit: (value: User) => void;
     loading?: boolean;
+    editingUser?: User | null;
+    onCancel?: () => void;
 };
 const AddEditForm = ({
     onSubmit,
     loading,
+    editingUser,
+    onCancel,
 }: AddEditFormProps) => {
     const [formState, setFormState] = useState<User>(formDefaultValues);
+
+    useEffect(() => {
+        if (editingUser) {
+            setFormState(editingUser);
+        } else {
+            setFormState(formDefaultValues);
+        }
+    }, [editingUser]);
 
     const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (loading) return;
         onSubmit(formState);
-        setFormState(formDefaultValues);
+        // Solo resetear el formulario si no estamos editando
+        if (!editingUser) {
+            setFormState(formDefaultValues);
+        }
     };
 
     const handleInputChange = (key: keyof User) => {
@@ -55,9 +70,14 @@ const AddEditForm = ({
             />
             <button type="submit" disabled={loading}>
                 {
-                    loading ? 'Guardando...' : 'Guardar'
+                    loading ? 'Guardando...' : (editingUser ? 'Actualizar' : 'Guardar')
                 }
             </button>
+            {editingUser && onCancel && (
+                <button type="button" onClick={onCancel} disabled={loading}>
+                    Cancelar
+                </button>
+            )}
         </form>
     );
 };
